@@ -18,7 +18,11 @@ public class RentACatImpl implements RentACat {
 	 */
 
 	public boolean returnCat(int id) {
-		// TODO: Fill in
+		Cat cat = cats.get(id-1);
+		if (cat != null && cat.getRented() == true){
+			cat.returnCat();
+			return true;
+		}
 		return false;
 	}
 
@@ -33,8 +37,14 @@ public class RentACatImpl implements RentACat {
 	 */
 
 	public boolean rentCat(int id) {
-		// TODO: Fill in
-		return false;
+		Cat cat = cats.get(id-1);
+		if (cat == null){return false;}
+		else if (cat.getRented() == true){return false;}
+		else{
+			cat.rentCat();
+			return true;
+		}
+		
 	}
 
 	/**
@@ -47,8 +57,15 @@ public class RentACatImpl implements RentACat {
 	 */
 
 	public boolean renameCat(int id, String name) {
-		// TODO: Fill in
-		return false;
+		Cat cat;
+		try{
+			cat = cats.get(id-1);
+			System.out.println(cat.toString());
+			cat.renameCat(name);
+			return true;
+		}
+		catch(IndexOutOfBoundsException e){System.out.println("Invalid cat ID."); return false;}
+		
 	}
 
 	/**
@@ -62,8 +79,11 @@ public class RentACatImpl implements RentACat {
 	 */
 
 	public String listCats() {
-		// TODO: Fill in
-		return "WRITE CODE FOR THIS";
+		StringBuilder ret = new StringBuilder();
+		for (Cat cat : cats){
+			ret.append("ID " + cat.getId() + ". " + cat.getName() + "\n");
+		}
+		return ret.toString();
 	}
 
 	/**
@@ -74,6 +94,7 @@ public class RentACatImpl implements RentACat {
 	 * @return Cat searched for if exists, null otherwise
 	 */
 
+	@SuppressWarnings("unused")
 	private Cat getCat(int id) {
 
 		// null check

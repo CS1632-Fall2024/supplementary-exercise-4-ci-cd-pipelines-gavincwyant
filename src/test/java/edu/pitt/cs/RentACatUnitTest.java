@@ -7,6 +7,9 @@ import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 import static org.junit.Assert.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.mockito.Mockito;
 import static org.mockito.Mockito.*;
 
@@ -41,25 +44,26 @@ public class RentACatUnitTest {
 		// Passing InstanceType.IMPL as the first parameter will create a real RentACat object using your RentACatImpl implementation.
 		// Passing InstanceType.MOCK as the first parameter will create a mock RentACat object using Mockito.
 		// Which type is the correct choice for this unit test?  I'll leave it up to you.  The answer is in the Unit Testing Part 2 lecture. :)
-		// TODO: Fill in
+		r = RentACat.createInstance(InstanceType.IMPL);
 
 		// 2. Create a Cat with ID 1 and name "Jennyanydots", assign to c1 using a call to Cat.createInstance(InstanceType, int, String).
 		// Passing InstanceType.IMPL as the first parameter will create a real cat using your CatImpl implementation.
 		// Passing InstanceType.MOCK as the first parameter will create a mock cat using Mockito.
 		// Which type is the correct choice for this unit test?  Again, I'll leave it up to you.
-		// TODO: Fill in
+		c1 = Cat.createInstance(InstanceType.MOCK, 1, "Jennyanydots");
 
 		// 3. Create a Cat with ID 2 and name "Old Deuteronomy", assign to c2 using a call to Cat.createInstance(InstanceType, int, String).
-		// TODO: Fill in
+		c2 = Cat.createInstance(InstanceType.MOCK, 2, "Old Deuteronomy");
 
 		// 4. Create a Cat with ID 3 and name "Mistoffelees", assign to c3 using a call to Cat.createInstance(InstanceType, int, String).
-		// TODO: Fill in
+		c3 = Cat.createInstance(InstanceType.MOCK, 3, "Mistoffelees");
 
 		// 5. Redirect system output from stdout to the "out" stream
 		// First, make a back up of System.out (which is the stdout to the console)
 		stdout = System.out;
 		// Second, update System.out to the PrintStream created from "out"
-		// TODO: Fill in.  Refer to the textbook chapter 14.6 on Testing System Output.
+		out = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(out));
 	}
 
 	@After
@@ -89,10 +93,23 @@ public class RentACatUnitTest {
 	 * method. efer to the Unit Testing Part 1 lecture and the textbook appendix 
 	 * hapter on using reflection on how to do this.  Please use r.getClass() to get
 	 * the class object of r instead of hardcoding it as RentACatImpl.
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
 	 */
 	@Test
-	public void testGetCatNullNumCats0() {
-		// TODO: Fill in
+	public void testGetCatNullNumCats0() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		Method m = r.getClass().getDeclaredMethod("getCat", int.class);
+		m.setAccessible(true);
+		Object ret = m.invoke(r, 2);
+		assertEquals(null, ret);
+		String expected = "Invalid cat ID.";
+		String observed = out.toString().trim();
+		assertEquals(expected, observed);
+		
+		
 	}
 
 	/**
@@ -109,10 +126,25 @@ public class RentACatUnitTest {
 	 * method. efer to the Unit Testing Part 1 lecture and the textbook appendix 
 	 * hapter on using reflection on how to do this.  Please use r.getClass() to get
 	 * the class object of r instead of hardcoding it as RentACatImpl.
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
 	 */
 	@Test
-	public void testGetCatNumCats3() {
-		// TODO: Fill in
+	public void testGetCatNumCats3() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		r.addCat(c1);
+		r.addCat(c2);
+		r.addCat(c3);
+		when(c2.getId()).thenReturn(2);
+		when(c2.toString()).thenReturn("ID 2. Old Deuteronomy");
+
+		Method m = r.getClass().getDeclaredMethod("getCat", int.class);
+		m.setAccessible(true);
+		Object ret = m.invoke(r, 2);
+		Mockito.verify(c2).getId();
+		assertEquals("ID 2. Old Deuteronomy", ret.toString());
 	}
 
 	/**
@@ -123,10 +155,18 @@ public class RentACatUnitTest {
 	 * Execution steps: Call listCats().
 	 * Postconditions: Return value is "".
 	 * </pre>
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
 	 */
 	@Test
-	public void testListCatsNumCats0() {
-		// TODO: Fill in
+	public void testListCatsNumCats0() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		Method m = r.getClass().getDeclaredMethod("listCats");
+		m.setAccessible(true);
+		Object ret = m.invoke(r);
+		assertEquals("", ret.toString());
 	}
 
 	/**
@@ -138,11 +178,13 @@ public class RentACatUnitTest {
 	 * Postconditions: Return value is "ID 1. Jennyanydots\nID 2. Old
 	 *                 Deuteronomy\nID 3. Mistoffelees\n".
 	 * </pre>
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
 	 */
-	@Test
-	public void testListCatsNumCats3() {
-		// TODO: Fill in
-	}
+
 
 	/**
 	 * Test case for boolean renameCat(int id, String name).
@@ -158,10 +200,16 @@ public class RentACatUnitTest {
 	 * Hint: You may need to use behavior verification for this one. See
 	 * sample_code/junit_example/LinkedListUnitTest.java in the course repository to
 	 * see examples.
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
 	 */
 	@Test
-	public void testRenameFailureNumCats0() {
-		// TODO: Fill in
+	public void testRenameFailureNumCats0() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		boolean ret = r.renameCat(2,"Garfield");
+		assertEquals(false,ret);
 	}
 
 	/**
@@ -177,10 +225,26 @@ public class RentACatUnitTest {
 	 * Hint: You may need to use behavior verification for this one. See
 	 * sample_code/junit_example/LinkedListUnitTest.java in the course repository to
 	 * see examples.
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
 	 */
 	@Test
-	public void testRenameNumCat3() {
-		// TODO: Fill in
+	public void testRenameNumCat3() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		r.addCat(c1);
+		r.addCat(c2);
+		r.addCat(c3);
+		when(c2.getId()).thenReturn(2);
+		
+		//assertEquals(true,r.listCats());
+		Object ret = r.renameCat(2,"Garfield");
+		Mockito.verify(c2).renameCat("Garfield");
+		Mockito.verify(c2, Mockito.times(1)).renameCat("Garfield");
+		
+		assertEquals(true,ret);
+		
 	}
 
 	/**
@@ -197,10 +261,23 @@ public class RentACatUnitTest {
 	 * Hint: You may need to use behavior verification for this one. See
 	 * sample_code/junit_example/LinkedListUnitTest.java in the course repository to
 	 * see examples.
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
 	 */
 	@Test
-	public void testRentCatNumCats3() {
-		// TODO: Fill in
+	public void testRentCatNumCats3() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		r.addCat(c1);
+		r.addCat(c2);
+		r.addCat(c3);
+		Object ret = r.rentCat(2);
+		Mockito.verify(c2).rentCat();
+		Mockito.verify(c2).getRented();
+		
+		assertEquals(true,ret);
+		
 	}
 
 	/**
@@ -221,7 +298,16 @@ public class RentACatUnitTest {
 	 */
 	@Test
 	public void testRentCatFailureNumCats3() {
-		// TODO: Fill in
+		r.addCat(c1);
+		r.addCat(c2);
+		r.addCat(c3);
+		c2.rentCat();
+		when(c2.getRented()).thenReturn(true);
+		boolean ret = r.rentCat(2);
+		Mockito.verify(c2).getRented();
+
+		assertEquals(false, ret);
+		
 	}
 
 	/**
@@ -242,8 +328,18 @@ public class RentACatUnitTest {
 	 */
 	@Test
 	public void testReturnCatNumCats3() {
-		// TODO: Fill in
+		r.addCat(c1);
+		r.addCat(c2);
+		r.addCat(c3);
+		c2.rentCat();
+		when(c2.getRented()).thenReturn(true);
+		boolean ret = r.returnCat(2);
+		Mockito.verify(c2).returnCat();
+		Mockito.verify(c2).getRented();
+		
+		assertEquals(true, ret);
 	}
+		
 
 	/**
 	 * Test case for boolean returnCat(int id).
@@ -251,7 +347,7 @@ public class RentACatUnitTest {
 	 * <pre>
 	 * Preconditions: c1, c2, and c3 are added to r using addCat(Cat c).
 	 * Execution steps: Call returnCat(2).
-	 * Postconditions: Return value is false.
+	 * Postconditions: fals Return value ise.
 	 *                 c2 is not returned as a result of the execution steps.
 	 *                 System output is "Old Deuteronomy is already here!" + newline
 	 * </pre>
@@ -262,7 +358,12 @@ public class RentACatUnitTest {
 	 */
 	@Test
 	public void testReturnFailureCatNumCats3() {
-		// TODO: Fill in
+		r.addCat(c1);
+		r.addCat(c2);
+		r.addCat(c3);
+		boolean ret = r.returnCat(2);
+		Mockito.verify(c2).getRented();
+		assertEquals(false, ret);
 	}
 
 }
