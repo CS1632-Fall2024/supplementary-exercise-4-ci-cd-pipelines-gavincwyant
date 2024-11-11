@@ -41,8 +41,8 @@ jobs:
     - name: Cache build
       uses: actions/cache@v3
       with:
-      key: cached-build-${{github.sha}}
-      path: .
+        key: cached-build-${{github.sha}}
+        path: .
 
     # https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload jacoco results as artifact
@@ -66,8 +66,8 @@ jobs:
     - name: Restore cached build
       uses: actions/cache@v3
       with:
-      key: cached-build-${{github.sha}}
-      path: .
+        key: cached-build-${{github.sha}}
+        path: .
 
     # https://github.com/marketplace/actions/maven-dependency-tree-dependency-submission
     - name: Update dependency graph
