@@ -75,9 +75,15 @@ jobs:
 
 
   build:
+    needs: [maven_test]
     name: Build and analyze
     runs-on: ubuntu-latest
     steps:
+      - name: Restore cached build
+        uses: actions/cache@v3
+        with:
+          key: cached-build-${{github.sha}}
+          path: .
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
